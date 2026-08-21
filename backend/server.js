@@ -23,7 +23,6 @@ const startApp = async () => {
   const tourCount = await Tour.countDocuments();
   if (tourCount === 0) {
     console.log('🌱 No tours found. Running auto-seed...');
-    // Simple seed logic for admin and sample data
     await User.deleteMany({});
     await User.create({
       name: 'Admin User',
@@ -34,12 +33,10 @@ const startApp = async () => {
     });
     console.log('👤 Admin created: admin@tour.com / admin123');
     
-    // Image URLs for tours
     const goldenTri = "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
     const kerala = "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
     const thailand = "https://images.unsplash.com/photo-1589181229070-0dc068beeaad?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
 
-    // We can reuse the sampleTours if we require them or just define a few
     const sampleTours = [
       { 
         name: 'Golden Triangle Tour', 
@@ -101,9 +98,7 @@ const startApp = async () => {
   }
 };
 
-startApp();
-
-app.use(express.json());                // Parse incoming JSON bodies
+app.use(express.json());
 
 // ── API Routes ───────────────────────────────────────────────
 app.use('/api/auth',     require('./routes/authRoutes'));
