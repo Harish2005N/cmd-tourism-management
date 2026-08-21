@@ -5,16 +5,17 @@ let mongod = null;
 
 const connectDB = async () => {
     try {
-        let uri = process.env.MONGO_URI;
+        let uri = process.env.MONGO_URI || process.env.MONGODB_URI;
         
-        // Attempt to connect to the provided URI
-        if (uri) {
+        if (!uri) {
+            console.log('⚠️  No MongoDB URI found. Falling back to in-memory database...');
+        } else {
             try {
-                await mongoose.connect(uri, { serverSelectionTimeoutMS: 2000 });
-                console.log('✅ Connected to existing MongoDB instance');
+                await mongoose.connect(uri, { serverSelectionTimeoutMS: 5000 });
+                console.log('✅ Connected to MongoDB');
                 return;
             } catch (err) {
-                console.log('⚠️  Could not connect to local MongoDB. Falling back to in-memory database...');
+                console.log('⚠️  Could not connect to provided MongoDB URI. Falling back to in-memory database...');
             }
         }
 
