@@ -1,45 +1,29 @@
 const mongoose = require('mongoose');
-const { MongoMemoryServer } = require('mongodb-memory-server');
-
-let mongod = null;
 
 const connectDB = async () => {
-    try {
-        let uri = process.env.MONGO_URI || process.env.MONGODB_URI;
-        
-        if (!uri) {
-            console.log('⚠️  No MongoDB URI found. Falling back to in-memory database...');
-        } else {
-            try {
-                await mongoose.connect(uri, { serverSelectionTimeoutMS: 5000 });
-                console.log('✅ Connected to MongoDB');
-                return;
-            } catch (err) {
-                console.log('⚠️  Could not connect to provided MongoDB URI. Falling back to in-memory database...');
-            }
-        }
+  try {
+    const uri = process.env.MONGODB_URI;
 
-        // Fallback: Start MongoMemoryServer
-        if (!mongod) {
-            mongod = await MongoMemoryServer.create();
-            uri = mongod.getUri();
-        }
-
-        await mongoose.connect(uri);
-        console.log('✅ Connected to in-memory MongoDB');
-        console.log(`🔗 URI: ${uri}`);
-    } catch (err) {
-        console.error('❌ Database connection failed:', err);
-        process.exit(1);
+    if (!uri) {
+      console.error('❌ MONGODB_URI environment variable is not set.');
+      console.error('   Set it in your Render dashboard or .env file.');
+      process.exit(1);
     }
+
+    await mongoose.connect(uri, {
+      serverSelectionTimeoutMS: 10000,
+    });
+
+    console.log('✅ Connected to MongoDB');
+    console.log(`   Database: ${mongoose.connection.name}`);
+  } catch (err) {
+    console.error('❌ Database connection failed:', err.message);
+    process.exit(1);
+  }
 };
 
 const closeDB = async () => {
-    await mongoose.connection.dropDatabase();
-    await mongoose.connection.close();
-    if (mongod) {
-        await mongod.stop();
-    }
+  await mongoose.connection.close();
 };
 
 module.exports = { connectDB, closeDB };
